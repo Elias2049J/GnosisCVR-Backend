@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 
 dotenv.config();
-app.use(cors());
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,6 +12,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
+app.use(cors({
+    origin: 'https://gnosiscvr.com'
+}));
 app.use(json());
 app.use(express.static(join(__dirname, 'public')));
 
