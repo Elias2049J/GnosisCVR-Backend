@@ -16,7 +16,6 @@ app.use(cors({
     origin: 'https://gnosiscvr.com'
 }));
 app.use(json());
-app.use(express.static(join(__dirname, 'public')));
 
 app.post('/guardar-form', async (req, res) => {
     try {
