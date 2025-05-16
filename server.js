@@ -1,13 +1,14 @@
 import dotenv from 'dotenv';
 import express, { json } from 'express';
 import cors from 'cors';
+import { insertForm } from './formController.js';
+import { createUser, getAllUsers } from './userController.js';
+import { loginAdmin, requireAdmin } from './authController.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
 
 const corsOptions = {
     origin: ['https://gnosiscvr.com', 'https://www.gnosiscvr.com'],
@@ -32,30 +33,51 @@ app.get('/test-env', (_, res) => {
     });
 });
 
-
-app.post('/guardar-form', async (req, res) => {
+//endpoint para insertar forms
+app.post('/save-form', async (req, res) => {
     try {
-        const response = await fetch(`${supabaseUrl}/rest/v1/forms_prereg`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': supabaseKey,
-                'Authorization': `Bearer ${supabaseKey}`
-            },
-            body: JSON.stringify(req.body)
-        });
-        
-        if (!response.ok) {
-            const error = await response.text();
-            console.error('Error al guardar en Supabase:', error);
-            return res.status(500).send(error);
-        }
-        
-        console.log('Formulario guardado correctamente en Supabase');
+        const result = await insertForm(req.body);
+        console.log('Formulario guardado correctamente en Supabase', result);
         res.status(200).send("Formulario guardado correctamente");
     } catch (err) {
         console.error('Error interno del servidor:', err);
         res.status(500).send("Error interno del servidor");
+    }
+});
+
+//endpoint para insertar usuarios
+app.post('/save-user', async (req, res) => {
+  try {
+    const userData = req.body;
+    const newUser = await createUser(userData);
+    console.log('Usuario guardado correctamente');
+    res.status(200).send("Formulario guardado correctamente");
+  } catch (err) {
+    console.error('Error interno del servidor:', err);
+    res.status(500).send("Error interno del servidor");
+  }
+});
+
+
+app.post('/login-admin', loginAdmin);
+
+app.get('/admin/users', requireAdmin, async (req, res) => {
+    try {
+        const users = await getAllUsers();
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener usuarios' })
+    }
+});
+
+app.patch('/admin/users/:id', requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role, active } = req.body;
+        const updated = await updateUser(id, { role, active });
+        res.json(updated);
+    } catch (err) {
+        res.status(500).json({ error: 'Error al actualizar usuario' });
     }
 });
 
