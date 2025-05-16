@@ -5,7 +5,7 @@ import { getUserByEmail } from './userController.js';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_TOKEN = process.env.JWT_TOKEN;
 
 export async function loginAdmin(req, res) {
     try {
@@ -40,7 +40,7 @@ export async function loginAdmin(req, res) {
 
         const token = jwt.sign(
             { userId: user.id, email: user.email, role: user.role },
-            JWT_SECRET,
+            JWT_TOKEN,
             { expiresIn: '8h' }
         );
 
@@ -65,7 +65,7 @@ export function requireAdmin(req, res, next) {
 
         const token = authHeader.split(' ')[1];
         
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_TOKEN);
         
         if (decoded.role !== 'admin') {
             return res.status(403).json({ error: 'No tienes permisos para realizar esta acción' });
