@@ -28,7 +28,7 @@ export async function insertForm(formData) {
 
 export async function selectForm() {
     try {
-        const query = 'SELECT * FROM forms_prereg ORDER BY created_at DESC';
+        const query = 'SELECT * FROM forms_prereg ORDER BY submit_date DESC';
         const { rows } = await pool.query(query);
         return rows;
     } catch (error) {
