@@ -96,7 +96,7 @@ app.patch('/admin/users/:id', requireAdmin, async (req, res) => {
 
 app.get('/test-db', async (_, res) => {
     try {
-        const result = await pool.query('SELECT * FROM forms_prereg');
+        const result = await pool.query('SELECT NOW()');
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Error de conexión DB:', error);
