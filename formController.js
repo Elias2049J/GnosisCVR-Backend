@@ -32,6 +32,6 @@ export async function selectForm() {
         const { rows } = await pool.query(query);
         return rows;
     } catch (error) {
-        throw new Error("Error al Obtener forms: ", error);
+        throw new Error("Error al Obtener forms: "+ error.message);
     }
 }
