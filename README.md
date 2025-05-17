@@ -1,2 +1,2 @@
 # GnosisCVR-Backend
-Backend for GnosisCVR web proyect
+Backend for GnosisCVR web project
