@@ -4,6 +4,7 @@ import cors from 'cors';
 import { insertForm, selectForm } from './formController.js';
 import { createUser, getAllUsers } from './userController.js';
 import { loginAdmin, requireAdmin } from './authController.js';
+import pool from './bd.js';
 
 
 dotenv.config();
