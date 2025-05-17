@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import pool from '.bd.js';
+import pool from './bd.js';
 
 dotenv.config();
 
