@@ -47,12 +47,13 @@ app.post('/save-form', async (req, res) => {
 });
 
 //endpoint para consultar forms
-app.get('/admin/forms', requireAdmin, async (req, res) => {
+app.get('/admin/forms', requireAdmin, async (_, res) => {
     try {
         const forms = await selectForm();
         res.status(200).json(forms);
         console.log('Formularios obetnidos con éxito');
     } catch (error) {
+        console.error('Error al obtener forms:', error);
         res.status(500).json({ error: 'Error al obtener forms' })
     }
 });
@@ -73,7 +74,7 @@ app.post('/save-user', async (req, res) => {
 
 app.post('/login-admin', loginAdmin);
 
-app.get('/admin/users', requireAdmin, async (req, res) => {
+app.get('/admin/users', requireAdmin, async (_, res) => {
     try {
         const users = await getAllUsers();
         res.json(users);
@@ -93,7 +94,15 @@ app.patch('/admin/users/:id', requireAdmin, async (req, res) => {
     }
 });
 
-
+app.get('/test-db', async (_, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM forms_prereg');
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Error de conexión DB:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Servidor iniciado en http://localhost:${PORT}`);
