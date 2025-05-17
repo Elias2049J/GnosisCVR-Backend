@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
 import express, { json } from 'express';
 import cors from 'cors';
-import { insertForm } from './formController.js';
+import { insertForm, selectForm } from './formController.js';
 import { createUser, getAllUsers } from './userController.js';
 import { loginAdmin, requireAdmin } from './authController.js';
+
 
 dotenv.config();
 
@@ -45,6 +46,17 @@ app.post('/save-form', async (req, res) => {
     }
 });
 
+//endpoint para consultar forms
+app.get('/admin/forms', requireAdmin, async (req, res) => {
+    try {
+        const forms = await selectForm();
+        res.status(200).json(forms);
+        console.log('Formularios obetnidos con éxito');
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener forms' })
+    }
+});
+
 //endpoint para insertar usuarios
 app.post('/save-user', async (req, res) => {
   try {
@@ -80,6 +92,8 @@ app.patch('/admin/users/:id', requireAdmin, async (req, res) => {
         res.status(500).json({ error: 'Error al actualizar usuario' });
     }
 });
+
+
 
 app.listen(PORT, () => {
     console.log(`Servidor iniciado en http://localhost:${PORT}`);

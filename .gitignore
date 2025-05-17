@@ -131,3 +131,7 @@ dist
 
 #hash
 hash.js
+hash2.js
+
+#ssl certificate
+prod-ca-2021.crt

@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+import pool from '.bd.js';
+
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -20,6 +22,16 @@ export async function insertForm(formData) {
         const errorText = await response.text();
         throw new Error(`Supabase error: ${errorText}`);
     }
-
     return await response.json();
+}
+
+
+export async function selectForm() {
+    try {
+        const query = 'SELECT * FROM forms_prereg ORDER BY created_at DESC';
+        const { rows } = await pool.query(query);
+        return rows;
+    } catch (error) {
+        throw new Error("Error al Obtener forms: ", error);
+    }
 }
