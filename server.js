@@ -4,8 +4,6 @@ import cors from 'cors';
 import { insertForm, selectForm } from './formController.js';
 import { createUser, getAllUsers } from './userController.js';
 import { loginAdmin, requireAdmin } from './authController.js';
-import pool from './bd.js';
-
 
 dotenv.config();
 
@@ -92,16 +90,6 @@ app.patch('/admin/users/:id', requireAdmin, async (req, res) => {
         res.json(updated);
     } catch (err) {
         res.status(500).json({ error: 'Error al actualizar usuario' });
-    }
-});
-
-app.get('/test-db', async (_, res) => {
-    try {
-        const result = await pool.query('SELECT NOW()');
-        res.json(result.rows[0]);
-    } catch (error) {
-        console.error('Error de conexión DB:', error);
-        res.status(500).json({ error: error.message });
     }
 });
 
