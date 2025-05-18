@@ -4,11 +4,14 @@ import cors from 'cors';
 import { insertForm, selectForm } from './formController.js';
 import { createUser, getAllUsers } from './userController.js';
 import { loginAdmin, requireAdmin } from './authController.js';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const JWT_TOKEN = process.env.JWT_TOKEN;
+const JWT_EXPIRATION = process.env.JWT_EXPIRATION;
 
 const corsOptions = {
     origin: ['https://gnosiscvr.com', 'https://www.gnosiscvr.com'],
@@ -33,7 +36,7 @@ app.get('/test-env', (_, res) => {
     });
 });
 
-//endpoint para insertar forms
+//endpoint para inserciones públicas de forms
 app.post('/save-form', async (req, res) => {
     try {
         const result = await insertForm(req.body);
@@ -58,21 +61,43 @@ app.get('/admin/forms', requireAdmin, async (_, res) => {
 });
 
 //endpoint para insertar usuarios
-app.post('/save-user', async (req, res) => {
+app.post('/admin/users', requireAdmin, async (req, res) => {
   try {
-    const userData = req.body;
-    const newUser = await createUser(userData);
-    console.log('Usuario guardado correctamente');
-    res.status(200).send("Formulario guardado correctamente");
+    res.status(201).json({message: "Usuario creado correctamente" });
+    console.log('Usuario creado correctamente en supabase');
   } catch (err) {
-    console.error('Error interno del servidor:', err);
+    console.error('Error al crear usuario:', err);
     res.status(500).send("Error interno del servidor");
   }
 });
 
+//endpoint para registros públicos
+app.post('/register', async (req, res) => {
+    try {
+        const userData = { ...req.body, role: "user"};
+        const newUser = await createUser(userData);
 
+        const token = jwt.sign(
+            { userId: newUser.id, email: newUser.email, role: newUser.role },
+            JWT_TOKEN,
+            { expiresIn: JWT_EXPIRATION}
+        );
+
+        res.status(200).json({
+            message: "Usuario registrado con éxito",
+            token,
+            user: { id: newUser.id, email: newUser.email, role: newUser.role }
+        });
+    } catch (error) {
+        console.error('Error al registrar usuario', error);
+        res.status(500).send("Error interno del servidor");
+    }
+});
+
+//endpoint para login de admin
 app.post('/login-admin', loginAdmin);
 
+//endpoint para consultar usuarios
 app.get('/admin/users', requireAdmin, async (_, res) => {
     try {
         const users = await getAllUsers();
@@ -82,6 +107,7 @@ app.get('/admin/users', requireAdmin, async (_, res) => {
     }
 });
 
+//endpoint para editar usuarios
 app.patch('/admin/users/:id', requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
@@ -93,7 +119,8 @@ app.patch('/admin/users/:id', requireAdmin, async (req, res) => {
     }
 });
 
+//puerto de escucha de express
 app.listen(PORT, () => {
-    console.log(`Servidor iniciado en http://localhost:${PORT}`);
+    console.log(`Servidor iniciado en el puerto: ${PORT}`);
     console.log(`CORS habilitado para: ${corsOptions.origin.join(', ')}`);
 });

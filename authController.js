@@ -6,6 +6,7 @@ import { getUserByEmail } from './userController.js';
 dotenv.config();
 
 const JWT_TOKEN = process.env.JWT_TOKEN;
+const JWT_EXPIRATION = process.env.JWT_EXPIRATION;
 
 export async function loginAdmin(req, res) {
     try {
@@ -41,7 +42,7 @@ export async function loginAdmin(req, res) {
         const token = jwt.sign(
             { userId: user.id, email: user.email, role: user.role },
             JWT_TOKEN,
-            { expiresIn: '8h' }
+            { expiresIn: JWT_EXPIRATION }
         );
 
         console.log("Login exitoso");
